@@ -1,0 +1,579 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>版本发布</title>
+		<link rel="stylesheet" type="text/css" href="res/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="res/themes/icon.css">
+		<!-- <link rel="stylesheet" type="text/css" href="../demo.css"> -->
+		<script type="text/javascript" src="res/js/jquery.min.js"></script>
+		<script type="text/javascript" src="res/js/jquery.easyui.min.js"></script>
+        <!-- <script src="js/jquery.min.js"></script> -->
+    </head>
+    <style>
+        body{
+            margin-top: 0px;
+            font:微软雅黑 12px;
+        }
+        div {
+            display: block;
+        }
+        #title{
+            width:100%;
+            height: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        #top{
+            margin-top: 20px;
+            height: 50;
+            position:fixed;
+            width: 100vw;
+        }
+        #log{
+            margin-top: 60px;
+            position:fixed;
+            width: 99vw;
+        }
+        #logmsg{
+            overflow:auto; 
+            height: 100px; 
+            width: 100%; 
+            border: 1px solid #999;
+        }
+        </style>
+    <body>
+        <div id='title'>女神联盟客户端内网发布</div>
+        <div id="top">
+            <span>项目选择：
+                <select  id="projectSel">
+                    <option value="none" selected="selected">请选择</option>
+                </select>
+            </span>  |
+            <button id="btn_inner" onclick="doOper('C2S_PublishInner')" class="easyui-linkbutton">发布内网</button>  |  
+            <button id="btn_fanyi" onclick="doOper('C2S_Translate')" class="easyui-linkbutton">翻译</button>  |
+            <button id="btn_res" onclick="doOper('C2S_PublishRes')" class="easyui-linkbutton">刷新res.json</button>  |  
+            <button id="btn_release" onclick="clickBtnRelease()" class="easyui-linkbutton">发布外网</button>|   
+            <hr/>
+        </div>
+        <div id="log">
+            <button id="btn_clearlog" class="easyui-linkbutton">清除日志</button>
+            <button id="btn_restar" onclick="doOper('C2S_ReStart')" class="easyui-linkbutton">重新启动</button>
+            <pre id="logmsg"></pre>
+        </div>
+        <!--提示用户是否发布的提示框-->
+        <div id="dlg" class="easyui-dialog" title="发布确认框" data-options="iconCls:'icon-tip',closed:'true'" style="width:500px;height:280px;padding:10px">
+            <div id='suerTxt' style="width: 100%; height: 120px;color: #ff0000;"></div>
+            <span> 版本选择：
+                <select  id="projectPubVerSel">
+                    <option value="none" selected="selected">请选择</option>
+                </select>
+                <input id="inputPubVer" type="text" name="Ver">
+            </span>
+            <div style="display: flex;">  
+                <a href="javascript:sureStartPubRelease()">@第一步</a>
+                <a href="javascript:getCdnSvnStat()">@第二步 提交cdn</a>
+                <a href="javascript:showCdnUrlState()">@第三步 显示cdn同步状态</a>
+                <a href="javascript:getWebSvnStat()">@第四步 提交web</a>
+            </div>
+            <hr/>
+            <div style="display: flex;">   
+                <button id="surePublishRelease" class="easyui-linkbutton" style="margin: 0 auto;text-align: center;display: block;">确认发布</button>
+                <button id="caclePublishRelease" class="easyui-linkbutton" onclick="$('#dlg').dialog('close')" style="margin: 0 auto;text-align: center;display: block;">取消发布</button>
+            </div>
+        </div>
+        <!-- 外网正式服svn修改内容提示框-->
+        <div id="dlgSvnListDlg" class="easyui-dialog" title="CDN文件提交" data-options="iconCls:'icon-tip',closed:'true'" style="width:450px;height:450px;padding:0px">
+            <div>
+                <input id="checkSvnListSelect" class="easyui-checkbox" name="checkAll" value="allselect" label="全选:">
+                <!-- <input id="checkSvnListSelect" class="easyui-switchbutton" data-options="onText:'全选',offText:'不选'"> -->
+            </div>
+            <div id="gridSvnList" class="easyui-datalist" title="" style="width:440px;margin-bottom: 20px;" data-options="
+                    checkbox: true,
+                    selectOnCheck: false,
+                    ">
+            </div>
+            <div style="display: flex;"> 
+                <button id="sureCdnSvnListPub" class="easyui-linkbutton" style="margin: 0 auto;text-align: center;display: block;">确认提交cdn</button>
+                <button id="cacleCdnSvnListPub" class="easyui-linkbutton" onclick="$('#dlgSvnListDlg').dialog('close')" style="margin: 0 auto;text-align: center;display: block;">取消提交cdn</button>
+            </div>
+        </div>
+        <!--外网version文件提交-->
+        <div id="pubVerCommitDlg" class="easyui-dialog" title="Web文件提交" data-options="iconCls:'icon-tip',closed:'true'" style="width:560px;height:450px;padding: 0px;float: left;">
+            <table class="easyui-datagrid" id="tableWebSvnList" title="" style="width:560px;padding:0px" data-options="iconCls:'icon-tip'"></table>
+                <thead>
+                </thead>
+            </table>
+            <div style="display: flex;">   
+                <button id="sureWebSvnListPub" class="easyui-linkbutton" style="margin: 0 auto;text-align: center;display: block;">确认提交web</button>
+                <button id="sureWebSvnListPub" class="easyui-linkbutton"  onclick="showCdnUrlState()" style="margin: 0 auto;text-align: center;display: block;">cdn同步状态</button>
+                <button id="cacleWebSvnListPub" class="easyui-linkbutton" onclick="$('#pubVerCommitDlg').dialog('close')" style="margin: 0 auto;text-align: center;display: block;">取消提交web</button>
+            </div>
+        </div>
+        <!--外网cdn文件状态是否已同步完成-->
+        <div id="cdnUrlStateListDlg" class="easyui-dialog" title="CDN文件状态" data-options="iconCls:'icon-tip',closed:'true'" style="width:560px;height:450px;padding: 0px;float: left;">
+            <table class="easyui-datagrid" id="tableCdnUrlStateList" title="" style="width:560px;padding:0px" data-options="iconCls:'icon-tip'"></table>
+                <thead>
+                </thead>
+            </table>
+            <div style="display: flex;">   
+                <button id="cdnUrlStateClose" class="easyui-linkbutton" onclick="$('#cdnUrlStateListDlg').dialog('close')" style="margin: 0 auto;text-align: center;display: block;">关闭</button>
+            </div>
+        </div>
+        <script>
+            var ws = getNewSocket();//new WebSocket("ws://172.18.1.5:22222");
+            showMsg("连接中....")
+            var connected = false;//当前的socket状态
+            var allProjectData;//所有项目的数据 
+            var curProjectData;//当前项目的数据
+            var cdnUrls;//当前cdn的url  {url:string , state:string}[]
+            var cdnUrlsLoadSuccessDic = {};//已经加载的cdn url  : {[url]:true|false}
+            var sockReConnectInterval = 0;//socket断线重连的intervalId
+            
+            //获取socket
+            function getNewSocket()
+            {
+                var ws = new WebSocket("ws://172.18.1.5:22222");//socket 链接相关
+                ws.onopen = function(){
+                    console.log("连接上了")
+                    showMsg("连接成功")
+                    connected = true;
+                }
+                ws.onclose = function(){
+                    console.log("关了")
+                    showMsg("连接关闭")
+                    connected = false;
+                    checkConnect();
+                }
+                ws.onmessage = function(e){
+                    let jsonstr = e.data;
+                    console.log("收到数据：", jsonstr);
+                    var data = JSON.parse(jsonstr);
+                    data.data = JSON.parse(data.data);
+                    handleMessage(data)//处理接受到的数据
+                }
+                ws.onerror = function(e)
+                {
+                    showMsg("链接发布服务器错误")
+                    connected = false;
+                    checkConnect();
+                }
+                return ws;
+            }
+            //开启断线重连 如果已经断线重连了则不处理
+            function checkConnect()
+            {
+                if(!sockReConnectInterval)
+                {
+                    showMsg("开始断线重连...");
+                    sockReConnectInterval = setInterval(handleSockeConnect, 5000);//每隔5s重连下
+                }
+            }
+            //断线后重新链接
+            function handleSockeConnect()
+            {
+                if(connected)
+                {
+                    if(sockReConnectInterval)
+                    {
+                        clearInterval(sockReConnectInterval);
+                        sockReConnectInterval = 0;
+                    }
+                    return;
+                }
+                showMsg("断线重连中...")
+                ws = getNewSocket();
+            }
+            //通用的发送给服务器指令， operId 指令id, param指令参数
+            function doOper(operId, param=null)
+            {
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                send({oper:operId, "param":param, "id":curProjectData.id})
+            }
+
+            //发布正式版
+            // $("#btn_release").click(clickBtnRelease);
+            function clickBtnRelease (){
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                $("#suerTxt").html("发布：<font size='22'>"+curProjectData.name+"</font>？");
+                var projectVerSel = $("#projectPubVerSel");
+                projectVerSel.empty();
+                var pubVers = curProjectData.pubVer;
+                for(var key in pubVers)
+                {
+                    $("<option value='"+pubVers[key].id+"'>" + pubVers[key].name + "</option>").appendTo(projectVerSel);
+                }
+                handlePubSelectChange();
+                $('#dlg').dialog('open');
+            };
+            $("#projectPubVerSel").change(handlePubSelectChange);
+            //版本改变
+            function handlePubSelectChange()
+            {
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                let ver = $("#projectPubVerSel").find("option:selected").val();
+                var pubVers = curProjectData.pubVer;
+                var pubVerInfo = pubVers[ver];
+                if(!pubVerInfo)
+                {
+                    alert("没有"+curProjectData.name+"找到对应的发布信息："+ver);
+                    return;
+                }
+                $("#inputPubVer").val(pubVerInfo.ver+"");
+                handlePubDesChange();
+            }
+            //输入正式版的版本号
+            $("#inputPubVer").on('input', handlePubDesChange)
+            function handlePubDesChange()
+            {
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                let ver = $("#projectPubVerSel").find("option:selected").val();
+                var pubVers = curProjectData.pubVer;
+                var pubVerInfo = pubVers[ver];
+                if(!pubVerInfo)
+                {
+                    alert("没有"+curProjectData.name+"找到对应的发布信息："+ver);
+                    return;
+                }
+                $("#suerTxt").html("发布<font size='20'>"+curProjectData.name+"-"+pubVerInfo.name+" "+$("#inputPubVer").val()+"</font>版本");
+            }
+            //确认发布正式版   
+            $("#surePublishRelease").click(function(){
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                let pubVer = $("#inputPubVer").val();
+                if(!pubVer)
+                {
+                    alert("版本号不能为空");
+                    return;
+                }
+                let ver = $("#projectPubVerSel").find("option:selected").val();
+                var pubVers = curProjectData.pubVer;
+                var pubVerInfo = pubVers[ver];
+                if(!pubVerInfo)
+                {
+                    alert("没有"+curProjectData.name+"找到对应的发布信息："+ver);
+                    return;
+                }
+                send({oper:"C2S_PublishRelease", "param":{"cpubVer":pubVer, "cpubId":pubVerInfo.id}, "id":curProjectData.id});
+                $('#dlg').dialog('close');
+            });
+
+            function getCdnSvnStat()
+            {
+                send({oper:"C2S_GetCdnStat", "param":null, "id":curProjectData.id});
+                $('#dlg').dialog('close');
+            }
+            function getWebSvnStat()
+            {
+                send({oper:"C2S_GetWebStat", "param":null, "id":curProjectData.id});
+                $('#dlg').dialog('close');
+            }
+            //清理日志
+            $("#btn_clearlog").click(function(){
+                $("#logmsg").text("");
+            })
+            //下拉项目列表
+            $("#projectSel").change(handleSelectChange);
+                
+            function handleSelectChange(){
+                let projectId = $("#projectSel").find("option:selected").val();
+                if(allProjectData)
+                    curProjectData = allProjectData[projectId];
+                else
+                    curProjectData = null;
+                if(!curProjectData)
+                {
+                    alert("没有找到项目对应的数据 id:"+projectId);
+                    return;
+                }
+                showMsg("<hr/>当前选择项目： <font color='#0000ff'>"+curProjectData.name+" id:"+curProjectData.id+"</font>");
+            }
+            //socket 发送消息
+            function send(data){
+                if(!data)return;
+                if(connected == false)
+                {
+                    showMsg("连接失败，请重新<a href='javascript:reload()'>刷新界面</a>");
+                    return;
+                }
+                ws.send(JSON.stringify(data));
+            }
+            //显示信息到页面上
+            function showMsg(msg)
+            {
+                handleMessage({type:"S2C_Msg", data:msg})
+            }
+            //处理信息
+            function handleMessage(msg)
+            {
+                if(msg.type == "S2C_Msg")//消息框内消息
+                {
+                    $("#logmsg").append(msg.data+"\n")
+                    $("#logmsg").scrollTop($("#logmsg")[0].scrollHeight);
+                }else if(msg.type == "S2C_Alert")//提示框
+                {
+                    alert(msg.data)
+                }else if(msg.type == "S2C_ProjectList"){//项目列表
+                    var dic = msg.data;
+                    allProjectData = msg.data;
+                    var projectSel = $("#projectSel");
+                    projectSel.empty();
+                    for(var key in dic)
+                    {
+                        $("<option value='"+dic[key].id+"'>" + dic[key].name + "</option>").appendTo(projectSel);
+                    }
+                    handleSelectChange();
+                }else if(msg.type == "S2C_SendCdnSvnList")//获取到svn信息列表
+                {
+                    if(msg.data.length==0)
+                    {
+                        showMsg("当前没有要提交的内容");
+                        alert("当前没有要提交的内容");
+                        return;
+                    }
+                    let arr = [];
+                    let alertStr = "";
+                    for(let i=0; i<msg.data.length; i++)
+                    {
+                        let item = msg.data[i];
+                        if(item.state != "add" && item.state != "preadd")
+                        {
+                            alertStr += "路径："+item.path+"不是新增项 state:"+item.state+"\n";
+                        }
+                        arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state});
+                    }
+                    if(alertStr!=""){
+                        showMsg(alertStr+"请联系管理员");
+                        alert(alertStr+"请联系管理员");
+                        return;
+                    }
+                    console.log("获取到svn信息：", msg.data);
+                    $('#dlgSvnListDlg').dialog('open');
+                    $('#gridSvnList').datagrid('clearChecked')
+                    $("#gridSvnList").datalist({'data':arr});
+                    $("#gridSvnList").datagrid('unselectAll');//去掉之前所有的不选择
+                    // $("#gridSvnList").datagrid('selectAll');
+                    // $("#gridSvnList").datagrid('unselectAll');
+                    //$("#gridSvnList").datagrid('getChecked');
+                }else if(msg.type == "S2C_SendWebSvnList"){//获取到web下的svn信息
+                    showWebSvnList(msg.data);
+                }
+            }
+
+
+            //svn信息列表全选
+            $("#checkSvnListSelect").checkbox({onChange:()=>{
+                if( $("#checkSvnListSelect").checkbox('options').checked)//全选
+                {
+                    $("#gridSvnList").datagrid('selectAll');
+                }else{
+                    $("#gridSvnList").datagrid('unselectAll');
+                }
+            }})
+            //确认提交正式版的svn
+            $("#sureCdnSvnListPub").click(sureStartPubRelease);
+                
+            function sureStartPubRelease(){
+                let allData = $("#gridSvnList").datagrid("getData").rows;
+                let selectData = $("#gridSvnList").datagrid("getChecked");
+                let list = [];
+                cdnUrls = [];//所有提交svn的cdn资源url
+                for(let i=0; i<allData.length; i++)
+                {
+                    let item = allData[i];
+                    if(selectData.indexOf(item) == -1)
+                    {
+                        console.log("没有选中的： "+item.path);
+                        list.push({state:"remove", path:item.path})
+                    }else{
+                        console.log("选中："+item.path);
+                        list.push({state:item.state, path:item.path})
+                        let isFileReg = /\/[^\/]*?\.\w+$/gi//后面跟着/xxxx.xxx的格式 滤掉文件夹
+                        if(isFileReg.test(item.path))
+                            cdnUrls.push({url:item.path.replace(curProjectData.pubClient, curProjectData.cdnUrl)});
+                    }
+                }
+                send({oper:"C2S_CommitCdn", "param":{"cplist":list}, "id":curProjectData.id});
+            }
+            //提交version文件
+            function showWebSvnList(data){
+                let arr = [];
+                let alertStr = "";
+                $('#dlgSvnListDlg').dialog('close');
+                if(data.length==0)
+                {
+                    showMsg("当前没有要提交的内容");
+                    alert("当前没有要提交的内容");
+                    return;
+                }
+                if(!curProjectData)
+                {
+                    alert("当前没有项目数据");
+                    return;
+                }
+                for(let i=0; i<data.length; i++)
+                {
+                    let item = data[i];
+                    if(item.state != "modify")
+                    {
+                        alertStr += "路径："+item.path+"不是修改项 state:"+item.state+"\n";
+                    }
+                    arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, url:item.path.replace(curProjectData.pubClient, curProjectData.cdnUrl)});
+                }
+                if(alertStr!=""){
+                        showMsg(alertStr+"请联系管理员");
+                        alert(alertStr+"请联系管理员");
+                        return;
+                    }
+                $('#pubVerCommitDlg').dialog('open');
+                $('#tableWebSvnList').datagrid('clearChecked')
+                $('#tableWebSvnList').datagrid({
+                columns:[[
+                    {field:'check',title:'选择',width:80, checkbox:true},
+                    {field:'state',title:'状态',width:80},
+                    {field:'path',title:'路径',width:200},
+                    {field:'url',title:'URL',width:200}
+                ]],
+                data:arr
+                });
+                if(cdnUrls && cdnUrls.length>0)
+                {
+                    showCdnUrlState();
+                }
+            }
+            $("#sureWebSvnListPub").click(function(){
+                let allData = $("#tableWebSvnList").datagrid("getData").rows;
+                let selectData = $("#tableWebSvnList").datagrid("getChecked");
+                let list = [];
+                for(let i=0; i<allData.length; i++)
+                {
+                    let item = allData[i];
+                    if(selectData.indexOf(item) == -1)
+                    {
+                        console.log("没有选中的： "+item.path);
+                        list.push({state:"remove", path:item.path})
+                    }else{
+                        console.log("选中："+item.path);
+                        list.push({state:item.state, path:item.path})
+                    }
+                }
+                send({oper:"C2S_CommitWeb", "param":{"cplist":list}, "id":curProjectData.id});
+                $('#dlgSvnListDlg').dialog('close');
+                $('#pubVerCommitDlg').dialog('close');
+                cdnUrls = null;//发布完成没有必要在显示了
+            })
+// 显示cdn文件的状态
+            /**当前倒计时的*/
+            let idIntervalRefushCdnUrl = 0;
+            function showCdnUrlState(){
+                if(!cdnUrls || cdnUrls.length==0)
+                {
+                    showMsg("当前没有cdn同步的资源");
+                    alert("当前没有cdn同步的资源");
+                    $('#cdnUrlStateListDlg').dialog('close');
+                    return;
+                }
+                $('#cdnUrlStateListDlg').dialog('open');
+                $('#tableCdnUrlStateList').datagrid('clearChecked')
+                let arr = [];
+                for(let i=0; i<cdnUrls.length; i++)
+                {
+                    let url = cdnUrls[i].url;
+                    arr.push({url:url, state:"None"});
+                }
+                $('#tableCdnUrlStateList').datagrid({
+                columns:[[
+                    {field:'state',title:'状态',width:80},
+                    {field:'url',title:'URL',width:500}
+                ]],
+                data:arr
+                });
+                if(idIntervalRefushCdnUrl)
+                    clearInterval(idIntervalRefushCdnUrl);//清理掉之前的interval
+                refushCdnUrlState();//先执行下
+                idIntervalRefushCdnUrl = setInterval(refushCdnUrlState, 5000);//每隔3s刷新下状态
+            }
+
+            function refushCdnUrlState(){
+                
+                if(!cdnUrls || cdnUrls.length == 0)
+                {
+                    if(idIntervalRefushCdnUrl)
+                        clearInterval(idIntervalRefushCdnUrl);//清理掉之前的interval
+                    return;
+                }
+                let loadNum = 0;
+                for(let i=0; i<cdnUrls.length; i++)
+                {
+                    let url = cdnUrls[i].url;
+                    if(cdnUrlsLoadSuccessDic[url])
+                        continue;
+                    let idx = i;
+                    loadNum ++;
+                    $.ajax({
+                        type: 'get',
+                        url: url,
+                        complete: function(XMLHttpRequest, textStatus) { 
+                            console.log(textStatus);
+                            let state = "失败"
+                            if(XMLHttpRequest.readyState == 4 && XMLHttpRequest.status == 200)
+                            {
+                                cdnUrlsLoadSuccessDic[url] = true;
+                                state = "成功";
+                            }
+                            $('#tableCdnUrlStateList').datagrid('updateRow',{
+                                index: idx,
+                                row: {
+                                    url: url,
+                                    state: state
+                                }
+                            });
+                        }
+                    })
+                }
+                if(loadNum == 0)//没有可以加载的算是已经加载完毕了
+                {
+                    alert("cdn资源同步完毕")
+                    if(idIntervalRefushCdnUrl)
+                        clearInterval(idIntervalRefushCdnUrl);//清理掉之前的interval
+                    idIntervalRefushCdnUrl = 0;
+                }
+                
+            }
+
+            //信息区随着页面尺寸改变
+            resize();
+            $().ready(function(){ 
+                resize();
+            });
+            $(window).resize(resize);  
+            function resize()
+            {
+                $("#logmsg").height($(window).height() - 140);
+                $("#logmsg").width($(window).width() - 40);
+            }
+
+        </script>
+        
+    </body>
+</html>

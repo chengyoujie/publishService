@@ -1,0 +1,46 @@
+{
+    "ns":{
+        "id":"ns",
+        "name":"女神",
+        "root":"D:/workpublish/trunk/",
+        "codedir":"nslm",
+        "data":"D:/cehua/Data",
+        "web":"D:/web",
+        "pubVer":{
+                    "test":{"name":"测试服", "id":"test", "ver":1.3}, 
+                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.1}
+                },
+        "pubClient":"D:/www/game",
+        "pubUrl":"https://nslmh5api.h5.youzu.com",
+        "cdnUrl":"https://cdn-ns-studio.uuzuonline.com/product-4006701/cdn1"
+    },
+    "nsback":{
+        "id":"nsback",
+        "name":"女神正式备份",
+        "root":"D:/workpublish/trunk/",
+        "codedir":"backup/back_1.3",
+        "data":"D:/cehua/Data",
+        "web":"D:/web",
+        "pubVer":{
+                    "test":{"name":"测试服", "id":"test", "ver":1.3}, 
+                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.1}
+                },
+        "pubClient":"D:/www/game",
+        "pubUrl":"https://nslmh5api.h5.youzu.com",
+        "cdnUrl":"https://cdn-ns-studio.uuzuonline.com/product-4006701/cdn1"
+    },
+    "hw":{
+        "id":"hw",
+        "name":"海外",
+        "root":"D:/publish/hw/code/",
+        "codedir":"nslm_hw",
+        "data":"D:/cehua/Data_TW",
+        "web":"D:/web_hw",
+        "pubVer":{
+                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.3}
+                },
+        "pubClient":"D:/www/game",
+        "pubUrl":"https://nslmh5api.h5.youzu.com",
+        "cdnUrl":"https://cdn-ns-studio.uuzuonline.com/product-4006701/cdn1"
+    }
+}

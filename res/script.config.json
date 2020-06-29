@@ -1,0 +1,48 @@
+{
+    "toolpath":"D:/workspace/trunk/tool",
+    "oper":{
+        "C2S_PublishInner":{
+            "name":"发布内网",
+            "exe":"node",
+            "jspath":"${toolpath}/内网发布/cmd.js",
+            "param":"${ip} ${name} ${id} ${root}${codedir} ${web}",
+            "workspace":"${root}${codedir}"
+        },
+        "C2S_PublishRes":{
+            "exe":"node",
+            "name":"刷新资源",
+            "jspath":"${toolpath}/RefreshRES/cmd.js",
+            "param_hw----":"${ip} resource/default.resfanyi.json resource res.group.json fanyi",
+            "param":"${ip} resource/default.res.json resource res.group.json",
+            "workspace":"${root}${codedir}"
+        },
+        "C2S_PublishRelease":{
+            "name":"发布外网",
+            "exe":"node",
+            "jspath":"${toolpath}/releaseTool/bin/Main.js",
+            "param":"${codedir} ${root} ${pubClient} ${web} ${pubUrl} \"\" ${cpubId} ${cpubVer}",
+            "workspace":"${root}${codedir}"
+        },
+        "C2S_CommitCdn":{
+            "name":"提交资源到CDN",
+            "exe":"node",
+            "jspath":"${toolpath}/小脚本/发布外网提交cdn资源/commitcdn.js",
+            "param":"\"${ip}\" \"cdn\" \"$${cplist}\"",
+            "workspace":"${root}${codedir}"
+        },
+        "C2S_CommitWeb":{
+            "name":"提交资源到Web",
+            "exe":"node",
+            "jspath":"${toolpath}/小脚本/发布外网提交cdn资源/commitcdn.js",
+            "param":"\"${ip}\" \"web\" \"${cplist}\"",
+            "workspace":"${root}${codedir}"
+        },
+        "C2S_Translate":{
+            "name":"翻译",
+            "exe":"node",
+            "jspath":"${toolpath}/translate/cmd.js",
+            "param":"\"${ip}\" \"${data}\" \"${web}\"",
+            "workspace":""
+        }
+    }
+}
