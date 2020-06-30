@@ -7,9 +7,10 @@
         "data":"D:/cehua/Data",
         "web":"D:/web",
         "pubVer":{
-                    "test":{"name":"测试服", "id":"test", "ver":1.3}, 
-                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.1}
-                },
+                "debug":{"name":"Debug版本", "id":"debug", "ver":1.1, "isRelease":false},
+                "test":{"name":"测试服", "id":"test", "ver":1.3, "isRelease":false},
+                "kg":{"name":"正式服", "id":"kg", "ver":1.3, "isRelease":true}
+            },
         "pubClient":"D:/www/game",
         "pubUrl":"https://nslmh5api.h5.youzu.com",
         "cdnUrl":"https://cdn-ns-studio.uuzuonline.com/product-4006701/cdn1"
@@ -22,8 +23,9 @@
         "data":"D:/cehua/Data",
         "web":"D:/web",
         "pubVer":{
-                    "test":{"name":"测试服", "id":"test", "ver":1.3}, 
-                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.1}
+                    "debug":{"name":"Debug版本", "id":"debug", "ver":1.1, "isRelease":false},
+                    "test":{"name":"测试服", "id":"test", "ver":1.3, "isRelease":false},
+                    "kg":{"name":"正式服", "id":"kg", "ver":1.3, "isRelease":true}
                 },
         "pubClient":"D:/www/game",
         "pubUrl":"https://nslmh5api.h5.youzu.com",

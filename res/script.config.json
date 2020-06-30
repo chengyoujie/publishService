@@ -19,21 +19,21 @@
         "C2S_PublishRelease":{
             "name":"发布外网",
             "exe":"node",
-            "jspath":"${toolpath}/releaseTool/bin/Main.js",
+            "jspath":"${toolpath}/小脚本/发布外网相关/cleanAndPublish.js",
             "param":"${codedir} ${root} ${pubClient} ${web} ${pubUrl} \"\" ${cpubId} ${cpubVer}",
             "workspace":"${root}${codedir}"
         },
         "C2S_CommitCdn":{
             "name":"提交资源到CDN",
             "exe":"node",
-            "jspath":"${toolpath}/小脚本/发布外网提交cdn资源/commitcdn.js",
+            "jspath":"${toolpath}/小脚本/发布外网相关/commitcdn.js",
             "param":"\"${ip}\" \"cdn\" \"$${cplist}\"",
             "workspace":"${root}${codedir}"
         },
         "C2S_CommitWeb":{
             "name":"提交资源到Web",
             "exe":"node",
-            "jspath":"${toolpath}/小脚本/发布外网提交cdn资源/commitcdn.js",
+            "jspath":"${toolpath}/小脚本/发布外网相关/commitcdn.js",
             "param":"\"${ip}\" \"web\" \"${cplist}\"",
             "workspace":"${root}${codedir}"
         },

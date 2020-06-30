@@ -6,6 +6,7 @@
 		<link rel="stylesheet" type="text/css" href="res/themes/default/easyui.css">
 		<link rel="stylesheet" type="text/css" href="res/themes/icon.css">
 		<!-- <link rel="stylesheet" type="text/css" href="../demo.css"> -->
+		<link rel="shortcut icon" href="./favicon.png">
 		<script type="text/javascript" src="res/js/jquery.min.js"></script>
 		<script type="text/javascript" src="res/js/jquery.easyui.min.js"></script>
         <!-- <script src="js/jquery.min.js"></script> -->
@@ -43,7 +44,7 @@
         }
         </style>
     <body>
-        <div id='title'>女神联盟客户端内网发布</div>
+        <div id='title'>女神联盟客户端工具</div>
         <div id="top">
             <span>项目选择：
                 <select  id="projectSel">
@@ -133,7 +134,8 @@
             var cdnUrls;//当前cdn的url  {url:string , state:string}[]
             var cdnUrlsLoadSuccessDic = {};//已经加载的cdn url  : {[url]:true|false}
             var sockReConnectInterval = 0;//socket断线重连的intervalId
-            
+            var serviceInfo;
+            var localIp;//本地ip
             //获取socket
             function getNewSocket()
             {
@@ -275,8 +277,13 @@
                 var pubVerInfo = pubVers[ver];
                 if(!pubVerInfo)
                 {
-                    alert("没有"+curProjectData.name+"找到对应的发布信息："+ver);
+                    alert("没有"+curProjectData.name+"找到对  应的发布信息："+ver);
                     return;
+                }
+                if(serviceInfo.serviceIp != localIp&&  pubVerInfo.isRelease)
+                {
+                    alert("为了安全，只能本地启动该服务器 才能发布正式服");
+                    return ;
                 }
                 send({oper:"C2S_PublishRelease", "param":{"cpubVer":pubVer, "cpubId":pubVerInfo.id}, "id":curProjectData.id});
                 $('#dlg').dialog('close');
@@ -337,6 +344,11 @@
                 }else if(msg.type == "S2C_Alert")//提示框
                 {
                     alert(msg.data)
+                }else if(msg.type == "S2C_InitClinetData")//初始化项目信息
+                {
+                    let data = msg.data;
+                    localIp = data.localIp;
+                    serviceInfo = data.serviceInfo;
                 }else if(msg.type == "S2C_ProjectList"){//项目列表
                     var dic = msg.data;
                     allProjectData = msg.data;
@@ -364,7 +376,7 @@
                         {
                             alertStr += "路径："+item.path+"不是新增项 state:"+item.state+"\n";
                         }
-                        let localUrl = curProjectData.httpUrl+"/down?url="+item.path;
+                        let localUrl = serviceInfo.httpUrl+"/down?url="+item.path;
                         arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, down:localUrl});
                     }
                     if(alertStr!=""){
@@ -379,6 +391,7 @@
                     $('#gridSvnList').datagrid({
                     columns:[[
                         {field:'check',title:'选择',width:80, checkbox:true},
+                        {field:'state',title:'状态',width:50},
                         {field:'path',title:'路径',width:300},
                         {field:"down", title:"下载", width:85,
                             //添加超级链 
@@ -458,7 +471,7 @@
                         alertStr += "路径："+item.path+"不是修改项 state:"+item.state+"\n";
                     }
                     let url = item.path.replace(curProjectData.pubClient, curProjectData.cdnUrl);
-                    let localUrl = curProjectData.httpUrl+"/down?url="+item.path;
+                    let localUrl = serviceInfo.httpUrl+"/down?url="+item.path;
                     arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, url:url, down:localUrl});
                 }
                 if(alertStr!=""){

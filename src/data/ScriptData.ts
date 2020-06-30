@@ -25,6 +25,8 @@
         S2C_Msg = "S2C_Msg",
         /**发送日志 */
         S2C_Alert = "S2C_Alert",
+        /**初始花客户端数据 */
+        S2C_InitClinetData = "S2C_InitClinetData",
         /**发送所有项目的基础信息 */
         S2C_ProjectList = "S2C_ProjectList",
         /**发布内网 */

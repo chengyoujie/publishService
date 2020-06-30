@@ -1,6 +1,7 @@
 import * as fs from "fs"
 import * as path from "path"
 import * as os from "os"
+import { App } from "../App";
 
 export interface IAppData{
     sockPort:number,
@@ -77,6 +78,18 @@ export class AppData{
     public getUserInfo(ip:string):IUserInfo
     {
         return this._data.userInfo[ip];
+    }
+
+    private _serviceInfoData:{httpUrl:string, serviceIp:string};
+    public get serviceInfoData(){
+        if(!this._serviceInfoData)
+        {
+            this._serviceInfoData = {
+                    httpUrl:"http://"+App.appData.localIp+":"+App.appData.httpPort,
+                    serviceIp:App.appData.localIp
+                }
+        }
+        return  this._serviceInfoData;
     }
 
     // /**

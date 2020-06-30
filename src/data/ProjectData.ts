@@ -59,7 +59,7 @@ export class ProjectData{
     }
 
 
-    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string , httpUrl:string}};
+    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string }};
     /**客户端链接成功后发送给客户端的信息 */
     public get allProjectInfo()
     {
@@ -71,7 +71,7 @@ export class ProjectData{
                 this._projectList[key] = {"id":key, name:this._data[key].name, 
                                             pubVer:this._data[key].pubVer, pubUrl:this._data[key].pubUrl, 
                                             cdnUrl:this._data[key].cdnUrl, pubClient:this._data[key].pubClient,
-                                            httpUrl:"http://"+App.appData.localIp+":"+App.appData.httpPort,
+                                            
                                         };
             }
         }

@@ -38,6 +38,7 @@ export class Socket extends Observer{
         let s= this;
         let client = new SocketConnection(con);
         s._conClients.push(client);
+        client.send(OperKey.S2C_InitClinetData, {localIp:client.ip, serviceInfo:App.appData.serviceInfoData})
         client.send(OperKey.S2C_ProjectList, App.projectData.allProjectInfo);
         client.on(EventType.SOCKET_CLIENT_REMOVE, s.handleSocketRemove, s, client)
         client.on(EventType.SOCKET_RECV_MSG, s.handleSocketRecvMsg, s, client)
