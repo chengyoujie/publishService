@@ -88,11 +88,15 @@
                 <input id="checkSvnListSelect" class="easyui-checkbox" name="checkAll" value="allselect" label="全选:">
                 <!-- <input id="checkSvnListSelect" class="easyui-switchbutton" data-options="onText:'全选',offText:'不选'"> -->
             </div>
-            <div id="gridSvnList" class="easyui-datalist" title="" style="width:440px;margin-bottom: 20px;" data-options="
+            <!-- <div id="gridSvnList" class="easyui-datalist" title="" style="width:440px;margin-bottom: 20px;" data-options="
                     checkbox: true,
                     selectOnCheck: false,
                     ">
-            </div>
+            </div> -->
+            <table class="easyui-datagrid" id="gridSvnList" title="" style="width:560px;padding:0px" data-options="iconCls:'icon-tip'"></table>
+                <thead>
+                </thead>
+            </table>
             <div style="display: flex;"> 
                 <button id="sureCdnSvnListPub" class="easyui-linkbutton" style="margin: 0 auto;text-align: center;display: block;">确认提交cdn</button>
                 <button id="cacleCdnSvnListPub" class="easyui-linkbutton" onclick="$('#dlgSvnListDlg').dialog('close')" style="margin: 0 auto;text-align: center;display: block;">取消提交cdn</button>
@@ -133,7 +137,7 @@
             //获取socket
             function getNewSocket()
             {
-                var ws = new WebSocket("ws://172.18.1.5:22222");//socket 链接相关
+                var ws = new WebSocket("ws://172.18.1.5:2221");//socket 链接相关
                 ws.onopen = function(){
                     console.log("连接上了")
                     showMsg("连接成功")
@@ -360,7 +364,8 @@
                         {
                             alertStr += "路径："+item.path+"不是新增项 state:"+item.state+"\n";
                         }
-                        arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state});
+                        let localUrl = curProjectData.httpUrl+"/down?url="+item.path;
+                        arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, down:localUrl});
                     }
                     if(alertStr!=""){
                         showMsg(alertStr+"请联系管理员");
@@ -370,7 +375,21 @@
                     console.log("获取到svn信息：", msg.data);
                     $('#dlgSvnListDlg').dialog('open');
                     $('#gridSvnList').datagrid('clearChecked')
-                    $("#gridSvnList").datalist({'data':arr});
+                    // $("#gridSvnList").datalist({'data':arr});
+                    $('#gridSvnList').datagrid({
+                    columns:[[
+                        {field:'check',title:'选择',width:80, checkbox:true},
+                        {field:'path',title:'路径',width:300},
+                        {field:"down", title:"下载", width:85,
+                            //添加超级链 
+                            formatter:function(value,rowData,rowIndex){
+                                //function里面的三个参数代表当前字段值，当前行数据对象，行号（行号从0开始）
+                                    return "<a href='"+value+"' >下载</a>";  
+                                }
+                        }
+                    ]],
+                    data:arr
+                    });
                     $("#gridSvnList").datagrid('unselectAll');//去掉之前所有的不选择
                     // $("#gridSvnList").datagrid('selectAll');
                     // $("#gridSvnList").datagrid('unselectAll');
@@ -438,10 +457,12 @@
                     {
                         alertStr += "路径："+item.path+"不是修改项 state:"+item.state+"\n";
                     }
-                    arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, url:item.path.replace(curProjectData.pubClient, curProjectData.cdnUrl)});
+                    let url = item.path.replace(curProjectData.pubClient, curProjectData.cdnUrl);
+                    let localUrl = curProjectData.httpUrl+"/down?url="+item.path;
+                    arr.push({path:item.path, "text":item.state + ":"+item.path, "state":item.state, url:url, down:localUrl});
                 }
                 if(alertStr!=""){
-                        showMsg(alertStr+"请联系管理员");
+                        showMsg(alertStr+"请联系管理员");   
                         alert(alertStr+"请联系管理员");
                         return;
                     }
@@ -452,7 +473,14 @@
                     {field:'check',title:'选择',width:80, checkbox:true},
                     {field:'state',title:'状态',width:80},
                     {field:'path',title:'路径',width:200},
-                    {field:'url',title:'URL',width:200}
+                    {field:'url',title:'URL',width:200},
+                    {field:"down", title:"下载", width:85,
+                         //添加超级链 
+                         formatter:function(value,rowData,rowIndex){
+                            //function里面的三个参数代表当前字段值，当前行数据对象，行号（行号从0开始）
+                                return "<a href='"+value+"' >下载</a>";  
+                            }
+                    }
                 ]],
                 data:arr
                 });

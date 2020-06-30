@@ -1,14 +1,19 @@
 import {Socket} from "./utils/socket/Socket"
 import { Oper } from "./oper/Oper";
-import { AppData } from "./data/AppData";
+import { ScriptData } from "./data/ScriptData";
 import { ProjectData } from "./data/ProjectData";
+import { AppData } from "./data/AppData";
+import { HttpService } from "./utils/http/HttpService";
 
 export class App{
-    public static data:AppData = new AppData();
+    public static appData:AppData = new AppData();
+    public static scriptData:ScriptData = new ScriptData();
     public static projectData:ProjectData = new ProjectData();
     
+    
     public static oper = new Oper();
-    public static sock = new Socket(22222, App.oper);
+    public static sock = new Socket(App.appData.sockPort, App.oper);
+    public static http = new HttpService(App.appData.httpPort);
 }
 
 // export class App2 extends App{

@@ -3,7 +3,7 @@ import { CMD } from "../utils/svn/CMD";
 import * as path from "path"
 import * as fs from "fs"
 // import { stdout } from "process";
-import { AppData, OperKey } from "../data/AppData";
+import {OperKey } from "../data/ScriptData";
 import { ProjectData, IProjectItemData } from "../data/ProjectData";
 import { App } from "../App";
 import { SVN, ISvnStateInfo } from "../utils/svn/SVN";
@@ -38,7 +38,7 @@ export class Oper implements IRecvSocket{
             return;
         }
         //配置中的命令
-        let operData = App.data.getOperData(oper);
+        let operData = App.scriptData.getOperData(oper);
         if(!operData)
         {
             console.log("没有找到"+oper+"对应的操作，请检查");

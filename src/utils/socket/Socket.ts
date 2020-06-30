@@ -3,7 +3,7 @@ import { SocketConnection } from "./SocketConnection";
 import { Observer, IEventData } from "../../event/Observer";
 import { EventType } from "../../event/EventType";
 import { App } from "../../App";
-import { OperKey } from "../../data/AppData";
+import { OperKey } from "../../data/ScriptData";
 
 export interface IRecvSocket{
     onRecv(ip:string, data:any)
@@ -27,6 +27,10 @@ export class Socket extends Observer{
         s._recv = recv;
         s._service = ws.createServer(s.clientConnection.bind(s));
         s._service.listen(prot,undefined, s.handleSocketStart.bind(s));
+        s._service.addListener("error", function (e:any) {
+            console.log("socket服务器启动失败");
+            console.log(e.message)
+        });
     }
 
     private clientConnection(con)
@@ -65,7 +69,7 @@ export class Socket extends Observer{
     private handleSocketStart()
     {
         let s = this;
-        console.log("服务器启动成功");
+        console.log("socket服务器启动成功");
         s.post(EventType.SOCKET_CREATE)
     }
 

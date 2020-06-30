@@ -1,6 +1,6 @@
 import {Socket} from "./utils/socket/Socket"
 import { App } from "./App";
-import { OperKey } from "./data/AppData";
+import { OperKey } from "./data/ScriptData";
 
 
 //代理console.log

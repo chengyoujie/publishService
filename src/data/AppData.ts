@@ -1,108 +1,93 @@
-    import * as fs from "fs"
-    import * as path from "path"
-    /**
-     * 当个项目的配置字段
-     */
-    export interface IAppOperData{
-        name:string;
-        exe:string;
-        jspath:string;
-        param:string;
-        workspace:string;
-    }
-    /**
-     * 应用配置数据
-     */
-    export interface IAppData{
-        toolpath:string, 
-        oper:{[id:number]:IAppOperData}
-    }
-    /**
-     * 操作key的常量
-     */
-    export const enum OperKey{
-        /**发送日志 */
-        S2C_Msg = "S2C_Msg",
-        /**发送日志 */
-        S2C_Alert = "S2C_Alert",
-        /**发送所有项目的基础信息 */
-        S2C_ProjectList = "S2C_ProjectList",
-        /**发布内网 */
-        C2S_PublishInner = "C2S_PublishInner",
-        /**发布资源 */
-        C2S_PublishRes = "C2S_PublishRes",
-        /**发布外网 仅发布不提交 */
-        C2S_PublishRelease = "C2S_PublishRelease",
-        /**发送给客户端cdn需要提交的内容 */
-        S2C_SendCdnSvnList = "S2C_SendCdnSvnList",
-        /**提交cdn上的资源 */
-        C2S_CommitCdn = "C2S_CommitCdn",
-        /**发送给客户端 web下需要提交的东西 */
-        S2C_SendWebSvnList = "S2C_SendWebSvnList",
-        /**提交web上的资源 */
-        C2S_CommitWeb = "C2S_CommitWeb",
-        /**获取cdn目录中文件的svn状态 */
-        C2S_GetCdnStat = "C2S_GetCdnStat",
-        /**获取web目录中文件的svn状态 */
-        C2S_GetWebStat = "C2S_GetWebStat",
-        /**重启服务器 */
-        C2S_ReStart = "C2S_ReStart",
-        /**翻译 */
-        C2S_Translate = "C2S_Translate"
+import * as fs from "fs"
+import * as path from "path"
+import * as os from "os"
 
+export interface IAppData{
+    sockPort:number,
+    httpPort:number;
+    userInfo:{[ip:string]:IUserInfo},
+}
+export interface IUserInfo{
+    uname:string;
+}
+
+
+export class AppData{
+
+    private _data:IAppData;
+    private _localIp:string;
+
+    constructor()
+    {
+        this.init();
     }
-    
-// export const enum SendType{
-//     Msg = "msg",
-//     Alert = "alert",
-//     ProjectList = "projectList",
-//     svnStateList = "svnStateList"
-// }
-    
-    export class AppData{
-    
-        private _data:IAppData;
-        
-        constructor()
-        {
-            this.init();
-        }
 
-        private init()
-        {
-            let jsonPath = path.join(__dirname, "../../res/script.config.json");
-            console.log(jsonPath);
-            let pjson = fs.readFileSync(jsonPath, "utf-8");
-            this._data = JSON.parse(pjson);
-            for(let key in this._data.oper)
-            {
-                let operData = this._data.oper[key];
-                if(!operData)continue;
-                operData.jspath = this.parseVarStr(operData.jspath);
-            }
-        }
 
-        private parseVarStr(str:string)
-        {
-            let pReg = /\$\{(.*?)\}/gi;
-            let arr ;
-            while(arr = pReg.exec(str))
-            {
-                let key = arr[1];
-                if(this._data[key])
-                {
-                    key = this._data[key];
-                }else{
-                    key = "";
+    private init()
+    {
+        let jsonPath = path.join(__dirname, "../../res/app.config.json");
+        console.log("读取应用配置： "+jsonPath);
+        let pjson = fs.readFileSync(jsonPath, "utf-8");
+        this._data = JSON.parse(pjson);
+        console.log("本机IP: "+this.localIp)
+    }
+
+    /**
+     * 获取服务器本机ip
+     */
+    public get localIp(){
+        if(this._localIp)return this._localIp;
+        var interfaces = os.networkInterfaces();
+        for(var devName in interfaces){
+            var iface = interfaces[devName];
+            for(var i=0;i<iface.length;i++){
+                var alias = iface[i];
+                if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+                    this._localIp = alias.address;
+                    return this._localIp;
                 }
-                str = str.replace(arr[0], key);
-                pReg.lastIndex = 0;
             }
-            return str;
         }
-    
-        public getOperData(operId:string):IAppOperData
-        {
-            return this._data.oper[operId]
-        }
+        return "";
+      }
+    // public data():IAppData
+    // {
+    //     return this._data;
+    // }
+    /**
+     * 获取服务器端口 号
+     */
+    public get sockPort():number
+    {
+        return this._data.sockPort;
     }
+
+    /**
+     * 获取http下载服务器port
+     */
+    public get httpPort():number
+    {
+        return this._data.httpPort;
+    }
+
+    /**
+     * 根据ip获取用户信息
+     * @param ip 用户ip
+     */
+    public getUserInfo(ip:string):IUserInfo
+    {
+        return this._data.userInfo[ip];
+    }
+
+    // /**
+    //  * 根据用户ip获取用户的名字
+    //  * @param ip 用户的ip
+    //  */
+    // public getUserName(ip:string):string
+    // {
+    //     if(this._data.userInfo[ip])
+    //         return this._data.userInfo[ip].uname;
+    //     return ip;
+    // }
+
+}

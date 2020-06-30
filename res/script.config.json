@@ -5,14 +5,14 @@
             "name":"发布内网",
             "exe":"node",
             "jspath":"${toolpath}/内网发布/cmd.js",
-            "param":"${ip} ${name} ${id} ${root}${codedir} ${web}",
+            "param":"${ip} ${name} ${id} ${root}${codedir} ${web} \"${data}\"",
             "workspace":"${root}${codedir}"
         },
         "C2S_PublishRes":{
             "exe":"node",
             "name":"刷新资源",
             "jspath":"${toolpath}/RefreshRES/cmd.js",
-            "param_hw----":"${ip} resource/default.resfanyi.json resource res.group.json fanyi",
+            "param_hw":"${ip} resource/default.resfanyi.json resource res.group.json fanyi",
             "param":"${ip} resource/default.res.json resource res.group.json",
             "workspace":"${root}${codedir}"
         },

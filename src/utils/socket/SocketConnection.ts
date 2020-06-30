@@ -1,6 +1,6 @@
 import { Observer } from "../../event/Observer";
 import { EventType } from "../../event/EventType";
-import { OperKey } from "../../data/AppData";
+import { OperKey } from "../../data/ScriptData";
 
 export class SocketConnection extends Observer{
     private _con:any;
@@ -54,7 +54,7 @@ export class SocketConnection extends Observer{
         s.post(EventType.SOCKET_CLIENT_REMOVE);
         if(err.code == "ECONNRESET")
         {
-            console.log("客户端主动断开");
+            console.log(s._ip+"客户端主动断开");
         }else{
             console.log("error ", err.message)
         }

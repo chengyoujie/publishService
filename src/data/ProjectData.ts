@@ -1,5 +1,7 @@
 import * as fs from "fs"
 import * as path from "path"
+import { AppData } from "./AppData";
+import { App } from "../App";
 /**
  * 当个项目的配置字段
  */
@@ -46,7 +48,7 @@ export class ProjectData{
     private init()
     {
         let jsonPath = path.join(__dirname, "../../res/project.config.json");
-        console.log(jsonPath);
+        console.log("读取项目配置： "+jsonPath);
         let pjson = fs.readFileSync(jsonPath, "utf-8");
         this._data = JSON.parse(pjson);
     }
@@ -57,7 +59,7 @@ export class ProjectData{
     }
 
 
-    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string }};
+    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string , httpUrl:string}};
     /**客户端链接成功后发送给客户端的信息 */
     public get allProjectInfo()
     {
@@ -66,7 +68,11 @@ export class ProjectData{
             this._projectList = {};
             for(let key in this._data)
             {
-                this._projectList[key] = {"id":key, name:this._data[key].name, pubVer:this._data[key].pubVer, pubUrl:this._data[key].pubUrl, cdnUrl:this._data[key].cdnUrl, pubClient:this._data[key].pubClient};
+                this._projectList[key] = {"id":key, name:this._data[key].name, 
+                                            pubVer:this._data[key].pubVer, pubUrl:this._data[key].pubUrl, 
+                                            cdnUrl:this._data[key].cdnUrl, pubClient:this._data[key].pubClient,
+                                            httpUrl:"http://"+App.appData.localIp+":"+App.appData.httpPort,
+                                        };
             }
         }
         return this._projectList;
