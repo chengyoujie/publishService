@@ -63,7 +63,7 @@
             <pre id="logmsg"></pre>
         </div>
         <!--提示用户是否发布的提示框-->
-        <div id="dlg" class="easyui-dialog" title="发布确认框" data-options="iconCls:'icon-tip',closed:'true'" style="width:500px;height:280px;padding:10px">
+        <div id="dlg" class="easyui-dialog" title="发布确认框" data-options="iconCls:'icon-tip',closed:'true'" style="width:550px;height:280px;padding:10px">
             <div id='suerTxt' style="width: 100%; height: 120px;color: #ff0000;"></div>
             <span> 版本选择：
                 <select  id="projectPubVerSel">
@@ -72,10 +72,10 @@
                 <input id="inputPubVer" type="text" name="Ver">
             </span>
             <div style="display: flex;">  
-                <a href="javascript:sureStartPubRelease()">@第一步</a>
-                <a href="javascript:getCdnSvnStat()">@第二步 提交cdn</a>
-                <a href="javascript:showCdnUrlState()">@第三步 显示cdn同步状态</a>
-                <a href="javascript:getWebSvnStat()">@第四步 提交web</a>
+                <a href="javascript:startPublishRelease()">@第一步 开始</a>|
+                <a href="javascript:getCdnSvnStat()">@第二步 提交cdn</a>|
+                <a href="javascript:showCdnUrlState()">@第三步 显示cdn同步状态</a>|
+                <a href="javascript:getWebSvnStat()">@第四步 提交web</a>|
             </div>
             <hr/>
             <div style="display: flex;">   
@@ -134,7 +134,7 @@
             var cdnUrls;//当前cdn的url  {url:string , state:string}[]
             var cdnUrlsLoadSuccessDic = {};//已经加载的cdn url  : {[url]:true|false}
             var sockReConnectInterval = 0;//socket断线重连的intervalId
-            var serviceInfo;
+            var serviceInfo;//服务器信息  {serviceIp:string, httpUrl:string}
             var localIp;//本地ip
             //获取socket
             function getNewSocket()
@@ -142,7 +142,7 @@
                 var ws = new WebSocket("ws://172.18.1.5:2221");//socket 链接相关
                 ws.onopen = function(){
                     console.log("连接上了")
-                    showMsg("连接成功")
+                    showMsg("连接成功<img src='./favicon.png' width='25px' height='25px'/>")
                     connected = true;
                 }
                 ws.onclose = function(){
@@ -260,7 +260,9 @@
                 $("#suerTxt").html("发布<font size='20'>"+curProjectData.name+"-"+pubVerInfo.name+" "+$("#inputPubVer").val()+"</font>版本");
             }
             //确认发布正式版   
-            $("#surePublishRelease").click(function(){
+            $("#surePublishRelease").click(startPublishRelease);
+                
+            function startPublishRelease(){
                 if(!curProjectData)
                 {
                     alert("当前没有项目数据");
@@ -287,7 +289,7 @@
                 }
                 send({oper:"C2S_PublishRelease", "param":{"cpubVer":pubVer, "cpubId":pubVerInfo.id}, "id":curProjectData.id});
                 $('#dlg').dialog('close');
-            });
+            }
 
             function getCdnSvnStat()
             {
