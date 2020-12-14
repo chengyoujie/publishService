@@ -23,8 +23,12 @@
     export const enum OperKey{
         /**发送日志 */
         S2C_Msg = "S2C_Msg",
+        /**指定项目的信息 */
+        S2C_Project_Msg = "S2C_Project_Msg",
         /**发送日志 */
         S2C_Alert = "S2C_Alert",
+        /**根据ip发送弹窗 */
+        S2C_Alert_Ip = "S2C_Alert_Ip",
         /**初始花客户端数据 */
         S2C_InitClinetData = "S2C_InitClinetData",
         /**发送所有项目的基础信息 */

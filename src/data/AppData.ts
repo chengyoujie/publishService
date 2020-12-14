@@ -33,6 +33,7 @@ export class AppData{
         console.log("本机IP: "+this.localIp)
     }
 
+
     /**
      * 获取服务器本机ip
      */
@@ -78,6 +79,17 @@ export class AppData{
     public getUserInfo(ip:string):IUserInfo
     {
         return this._data.userInfo[ip];
+    }
+
+    /**
+     * 根据用户ip获取用户名字如果没有则使用ip
+     * @param ip 
+     */
+    public getUserName(ip:string):string
+    {
+        if(this._data.userInfo[ip])
+            return this._data.userInfo[ip].uname;
+        return ip;
     }
 
     private _serviceInfoData:{httpUrl:string, serviceIp:string};

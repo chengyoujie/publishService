@@ -1,6 +1,7 @@
 import { Observer } from "../../event/Observer";
 import { EventType } from "../../event/EventType";
 import { OperKey } from "../../data/ScriptData";
+import { App } from "../../App";
 
 export class SocketConnection extends Observer{
     private _con:any;
@@ -17,7 +18,7 @@ export class SocketConnection extends Observer{
         if(ipArr)ip = ipArr[0]
         s._ip = ip;
         // let conins = con;
-        console.log("客户端链接成功: "+ip);
+        console.log("客户端链接成功: "+App.appData.getUserName(ip));
         con.on("text", s.handleSocketData.bind(s))
         con.on("close", s.handleClose.bind(s))
         con.on("error", s.handleError.bind(s));
@@ -27,7 +28,7 @@ export class SocketConnection extends Observer{
     private handleSocketData(str:string){
         let s = this;
         let data;
-        console.log("接受操作指令： "+str);
+        // console.log("接受操作指令： "+str);
         try{
             data = JSON.parse(str);
             s.post(EventType.SOCKET_RECV_MSG, data);
@@ -52,12 +53,13 @@ export class SocketConnection extends Observer{
     {
         let s = this;
         s.post(EventType.SOCKET_CLIENT_REMOVE);
-        if(err.code == "ECONNRESET")
-        {
-            console.log(s._ip+"客户端主动断开");
-        }else{
-            console.log("error ", err.message)
-        }
+        // if(err.code == "ECONNRESET")
+        // {
+        //     console.log(s._ip+"客户端主动断开");
+        // }else{
+        //     console.log("error ", err.message)
+        // }
+        console.log( App.appData.getUserName(s._ip) +" 离线");
     }
 
     public send(sendType:OperKey, msg:any)

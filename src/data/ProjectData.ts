@@ -20,11 +20,18 @@ export interface IProjectItemData{
     pubVer:{[id:string]:IProjectVerInfo};
     /**发布的文件路径 */
     pubClient:string;
+    /**发布时拷贝的文件路径 */
+    pubCopyClient:string;
+    /**发布时用到的配置路径 */
+    pubDataPath:string;
     /**发布的url */
     pubUrl:string;
     /**cdnUrl */
     cdnUrl:string;
-
+    /**内网地址 */
+    innerWeb:string;
+    /**支持的语言版本 */
+    langs:{tag:string, name:string}[];
 }
 /**
  * 项目发布的版本信息
@@ -32,7 +39,6 @@ export interface IProjectItemData{
 export interface IProjectVerInfo{
     name:string;
     type:string;
-    ver:number;
 }
 
 export class ProjectData{
@@ -59,7 +65,7 @@ export class ProjectData{
     }
 
 
-    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string }};
+    private _projectList:{[id:string]:{"id":string, "name":string, pubVer:{[id:string]:IProjectVerInfo}, pubUrl:string , pubClient:string, cdnUrl:string, langs:{name:string, tag:string}[] , innerWeb:string}};
     /**客户端链接成功后发送给客户端的信息 */
     public get allProjectInfo()
     {
@@ -71,7 +77,8 @@ export class ProjectData{
                 this._projectList[key] = {"id":key, name:this._data[key].name, 
                                             pubVer:this._data[key].pubVer, pubUrl:this._data[key].pubUrl, 
                                             cdnUrl:this._data[key].cdnUrl, pubClient:this._data[key].pubClient,
-                                            
+                                            langs:this._data[key].langs,
+                                            innerWeb:this._data[key].innerWeb
                                         };
             }
         }

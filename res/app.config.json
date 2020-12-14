@@ -1,6 +1,7 @@
 {
-    "sockPort":2221,
-    "httpPort":3331,
+    "sockPort":22222,
+    "httpPort":33331,
+	"webPath":"D:/www",
     "userInfo":{
     }
 }

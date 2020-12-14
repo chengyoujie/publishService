@@ -12,12 +12,16 @@ console.log = function(message?: any, ...optionalParams: any[])
     App.sock.sendAll(OperKey.S2C_Msg, message);
 }
 //代理console.warn
-let standWarn = console.warn;//客户端弹出alert提示框
-console.warn = function(message?: any, ...optionalParams: any[])
-{
-    standWarn(message, ...optionalParams)
-    App.sock.sendAll(OperKey.S2C_Alert, message);
-}
+// let standWarn = console.warn;//客户端弹出alert提示框
+// console.warn = function(message?: any, ...optionalParams: any[])
+// {
+//     standWarn(message, ...optionalParams)
+//     App.sock.sendAll(OperKey.S2C_Alert, message);
+//     if(optionalParams.length>0)
+//     {
+//         App.sock.sendByIp(optionalParams[0], OperKey.S2C_Alert_Ip, message);
+//     }
+// }
 
 
 
